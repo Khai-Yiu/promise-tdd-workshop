@@ -9,4 +9,14 @@ describe('MyPromise', () => {
 
         expect(typeof myPromise.then).toBe('function');
     });
+    it('should resolve with a value', () => {
+        const executor = (resolveFunction) => {
+            resolveFunction(1);
+        };
+        const myPromise = new MyPromise(executor);
+        const functionToCallWhenPromiseIsResolved = jest.fn();
+        myPromise.then(functionToCallWhenPromiseIsResolved);
+
+        expect(functionToCallWhenPromiseIsResolved).toHaveBeenCalledWith(1);
+    });
 });
