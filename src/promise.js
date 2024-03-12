@@ -1,3 +1,5 @@
-function MyPromise() {}
+function MyPromise() {
+    this.then = () => {};
+}
 
 export default MyPromise;
