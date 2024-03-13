@@ -1,21 +1,31 @@
+const STATE = {
+    PENDING: 'pending',
+    FULFILLED: 'fulfilled'
+};
+
 function MyPromise(executor = () => {}) {
-    this.then = (onResolvedFunction) => {
-        this.onResolvedFunction = onResolvedFunction;
-
-        if (this.result !== undefined) {
-            onResolvedFunction(this.result);
+    this.then = (functionToCallWhenPromiseIsResolved) => {
+        if (this.state === STATE.PENDING) {
+            this.functionToCallWhenPromiseIsResolved =
+                functionToCallWhenPromiseIsResolved;
+        } else if (this.state === STATE.FULFILLED) {
+            functionToCallWhenPromiseIsResolved(this.result);
         }
     };
 
-    this.resolveFunction = (result) => {
-        this.result = result;
+    this.functionToResolvePromise = (result) => {
+        if (this.state === STATE.PENDING) {
+            this.result = result;
+            this.state = STATE.FULFILLED;
 
-        if (this.onResolvedFunction !== undefined) {
-            this.onResolvedFunction(result);
+            if (this.functionToCallWhenPromiseIsResolved !== undefined) {
+                this.functionToCallWhenPromiseIsResolved(result);
+            }
         }
     };
 
-    executor(this.resolveFunction);
+    this.state = STATE.PENDING;
+    executor(this.functionToResolvePromise);
 }
 
 export default MyPromise;
