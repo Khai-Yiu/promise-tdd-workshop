@@ -47,6 +47,22 @@ describe('MyPromise', () => {
                 ).toHaveBeenCalledWith(1);
             });
         });
+        describe('and the callback is registered after it resolves', () => {
+            it('calls the registered callback immediately', () => {
+                const executor = (resolveFunction) => {
+                    setTimeout(() => {
+                        resolveFunction(1);
+                    }, 10000);
+                };
+                const myPromise = new MyPromise(executor);
+                const functionToCallWhenPromiseIsResolved = jest.fn();
+                jest.runAllTimers();
+                myPromise.then(functionToCallWhenPromiseIsResolved);
+                expect(
+                    functionToCallWhenPromiseIsResolved
+                ).toHaveBeenCalledWith(1);
+            });
+        });
     });
 });
 
