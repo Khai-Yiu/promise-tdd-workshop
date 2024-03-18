@@ -1,15 +1,23 @@
 const STATE = {
     PENDING: 'pending',
-    FULFILLED: 'fulfilled'
+    FULFILLED: 'fulfilled',
+    REJECTED: 'rejected'
 };
 
 function MyPromise(executor = () => {}) {
-    this.then = (functionToCallWhenPromiseIsResolved) => {
+    this.then = (
+        functionToCallWhenPromiseIsResolved,
+        functionToCallWhenPromiseIsRejected
+    ) => {
         if (this.state === STATE.PENDING) {
             this.functionToCallWhenPromiseIsResolved =
                 functionToCallWhenPromiseIsResolved;
+            this.functionToCallWhenPromiseIsRejected =
+                functionToCallWhenPromiseIsRejected;
         } else if (this.state === STATE.FULFILLED) {
             functionToCallWhenPromiseIsResolved(this.result);
+        } else if (this.state === STATE.REJECTED) {
+            functionToCallWhenPromiseIsRejected(this.result);
         }
     };
 
@@ -24,8 +32,19 @@ function MyPromise(executor = () => {}) {
         }
     };
 
+    this.functionToRejectPromise = (result) => {
+        if (this.state === STATE.PENDING) {
+            this.result = result;
+            this.state = STATE.REJECTED;
+
+            if (this.functionToCallWhenPromiseIsRejected !== undefined) {
+                this.functionToCallWhenPromiseIsRejected(result);
+            }
+        }
+    };
+
     this.state = STATE.PENDING;
-    executor(this.functionToResolvePromise);
+    executor(this.functionToResolvePromise, this.functionToRejectPromise);
 }
 
 export default MyPromise;
