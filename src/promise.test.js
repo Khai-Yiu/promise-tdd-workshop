@@ -49,6 +49,8 @@ describe('MyPromise', () => {
                         functionToCallWhenPromiseIsResolved
                     ).toHaveBeenCalledWith(1);
                 });
+            });
+            describe('and the callback is registered after it resolves', () => {
                 it('calls the registered callback immediately', () => {
                     const executor = (resolveFunction) => {
                         setTimeout(() => {
@@ -129,6 +131,12 @@ describe('MyPromise', () => {
                 });
             });
         });
+    });
+    it('returns a promise that is immediately resolved to a value', () => {
+        const myResolvedPromise = MyPromise.resolve('Resolved');
+        expect(myResolvedPromise).toBeInstanceOf(MyPromise);
+        expect(myResolvedPromise.state).toBe('fulfilled');
+        expect(myResolvedPromise.result).toBe('Resolved');
     });
 });
 
