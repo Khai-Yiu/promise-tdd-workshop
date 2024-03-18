@@ -44,6 +44,7 @@ describe('MyPromise', () => {
                     const functionToCallWhenPromiseIsResolved = jest.fn();
                     myPromise.then(functionToCallWhenPromiseIsResolved);
                     jest.runAllTimers();
+
                     expect(
                         functionToCallWhenPromiseIsResolved
                     ).toHaveBeenCalledWith(1);
@@ -58,10 +59,25 @@ describe('MyPromise', () => {
                     const functionToCallWhenPromiseIsResolved = jest.fn();
                     jest.runAllTimers();
                     myPromise.then(functionToCallWhenPromiseIsResolved);
+
                     expect(
                         functionToCallWhenPromiseIsResolved
                     ).toHaveBeenCalledWith(1);
                 });
+            });
+        });
+    });
+    describe('given a promise that rejects', () => {
+        describe('immediately', () => {
+            it('calls the registered callback', () => {
+                const executor = (resolveFunction, rejectFunction) => {
+                    rejectFunction('Rejected');
+                };
+                const myPromise = new MyPromise(executor);
+                const functionToCallWhenPromiseIsRejected = jest.fn();
+                myPromise.then(undefined, functionToCallWhenPromiseIsRejected);
+
+                expect(functionToCallWhenPromiseIsRejected).cal('Rejected');
             });
         });
     });
