@@ -218,5 +218,20 @@ describe('MyPromise', () => {
             expect(newPromise).toBeInstanceOf(MyPromise);
             expect(callback).toHaveBeenCalledWith([]);
         });
+        it('resolves an array of results given a promise either resolves or rejects', () => {
+            const arrayOfPromises = [
+                MyPromise.resolve(1),
+                MyPromise.reject('Rejected')
+            ];
+            const callback = jest.fn();
+            const newPromise = MyPromise.allSettled(arrayOfPromises);
+            newPromise.then(callback);
+
+            expect(newPromise).toBeInstanceOf(MyPromise);
+            expect(callback).toHaveBeenCalledWith([
+                { status: 'fulfilled', value: 1 },
+                { status: 'rejected', value: 'Rejected' }
+            ]);
+        });
     });
 });
