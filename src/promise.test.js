@@ -168,6 +168,19 @@ describe('MyPromise', () => {
             expect(newPromise).toBeInstanceOf(MyPromise);
             expect(callback).toHaveBeenCalledWith([1, 2, 3]);
         });
+        it('rejects if any promise rejects', () => {
+            const arrayOfPromises = [
+                MyPromise.resolve(1),
+                MyPromise.reject('Rejected'),
+                MyPromise.resolve(2)
+            ];
+            const callback = jest.fn();
+            const newPromise = MyPromise.all(arrayOfPromises);
+            newPromise.then(undefined, callback);
+
+            expect(newPromise).toBeInstanceOf(MyPromise);
+            expect(callback).toHaveBeenCalledWith('Rejected');
+        });
     });
 });
 
