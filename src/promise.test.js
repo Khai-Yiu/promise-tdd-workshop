@@ -147,13 +147,26 @@ describe('MyPromise', () => {
         expect(callback).toHaveBeenCalledWith('Rejected');
     });
     describe('given an array of promises passed to MyPromise.all()', () => {
-        it('resolved to an empty array given an empty array', () => {
+        it('resolves to an empty array given an empty array', () => {
             const arrayOfPromises = [];
             const callback = jest.fn();
             const newPromise = MyPromise.all(arrayOfPromises);
             newPromise.then(callback);
             expect(newPromise).toBeInstanceOf(MyPromise);
             expect(callback).toHaveBeenCalledWith([]);
+        });
+        it('resolves to an array of results given all promises resolve', () => {
+            const arrayOfPromises = [
+                MyPromise.resolve(1),
+                MyPromise.resolve(2),
+                MyPromise.resolve(3)
+            ];
+            const callback = jest.fn();
+            const newPromise = MyPromise.all(arrayOfPromises);
+            newPromise.then(callback);
+
+            expect(newPromise).toBeInstanceOf(MyPromise);
+            expect(callback).toHaveBeenCalledWith([1, 2, 3]);
         });
     });
 });
