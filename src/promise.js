@@ -65,13 +65,23 @@ MyPromise.reject = function (result) {
 
 MyPromise.all = function (arrayOfPromises) {
     const arrayOfResults = [];
-    for (let i = 0; i < arrayOfPromises.length; i++) {
-        arrayOfPromises[i].then((result) => {
-            arrayOfResults[i] = result;
-        });
+    let rejectedPromiseResult;
+    let isRejected = false;
+    for (let i = 0; i < arrayOfPromises.length && !isRejected; i++) {
+        arrayOfPromises[i].then(
+            (resolveValue) => {
+                arrayOfResults[i] = resolveValue;
+            },
+            (rejectValue) => {
+                rejectedPromiseResult = rejectValue;
+                isRejected = true;
+            }
+        );
     }
 
-    return MyPromise.resolve(arrayOfResults);
+    return isRejected
+        ? MyPromise.reject(rejectedPromiseResult)
+        : MyPromise.resolve(arrayOfResults);
 };
 
 export default MyPromise;
