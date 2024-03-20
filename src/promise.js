@@ -55,4 +55,11 @@ MyPromise.resolve = function (result) {
     return new MyPromise(executor);
 };
 
+MyPromise.reject = function (result) {
+    const executor = (resolveFunction, rejectFunction) => {
+        rejectFunction(result);
+    };
+
+    return new MyPromise(executor);
+};
 export default MyPromise;
