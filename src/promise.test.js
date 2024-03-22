@@ -281,5 +281,26 @@ describe('MyPromise', () => {
             expect(newPromise).toBeInstanceOf(MyPromise);
             expect(callback).toHaveBeenCalledWith(1);
         });
+        it('resolves to the value of the first promise given an array of promises settling at different times', () => {
+            jest.useFakeTimers();
+
+            const arrayOfPromises = [
+                new MyPromise((resolve, reject) =>
+                    setTimeout(() => resolve(1), 1000)
+                ),
+                MyPromise.reject(2),
+                MyPromise.resolve(3)
+            ];
+
+            const callback = jest.fn();
+            const newPromise = MyPromise.race(arrayOfPromises);
+            newPromise.then(callback);
+            jest.runAllTimers();
+
+            expect(newPromise).toBeInstanceOf(MyPromise);
+            expect(callback).toHaveBeenCalledWith(2);
+
+            jest.useRealTimers();
+        });
     });
 });
