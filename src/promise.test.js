@@ -258,4 +258,16 @@ describe('MyPromise', () => {
             jest.useRealTimers();
         });
     });
+    describe('given an array of promises passed to MyPromise.race()', () => {
+        it("returns a promise that's not settled given an empty array", () => {
+            const arrayOfPromises = [];
+            const callback = jest.fn();
+            const newPromise = MyPromise.race(arrayOfPromises);
+            newPromise.then(callback);
+
+            expect(newPromise).toBeInstanceOf(MyPromise);
+            expect(newPromise.state).toBe('pending');
+            expect(callback).not.toHaveBeenCalled();
+        });
+    });
 });
