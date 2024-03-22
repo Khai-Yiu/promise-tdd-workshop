@@ -292,15 +292,25 @@ describe('MyPromise', () => {
                 MyPromise.resolve(3)
             ];
 
-            const callback = jest.fn();
+            const resolvedCallback = jest.fn();
+            const rejectedCallback = jest.fn();
             const newPromise = MyPromise.race(arrayOfPromises);
-            newPromise.then(callback);
+            newPromise.then(resolvedCallback, rejectedCallback);
             jest.runAllTimers();
 
             expect(newPromise).toBeInstanceOf(MyPromise);
-            expect(callback).toHaveBeenCalledWith(2);
+            expect(rejectedCallback).toHaveBeenCalledWith(2);
 
             jest.useRealTimers();
+        });
+        it('settles to the first occurrence of either a non-promise value or a settled promise, given an array of promises and non-promise values', () => {
+            const arrayOfPromisesAndNonPromises = [1, MyPromise.resolve(2), 3];
+            const callback = jest.fn();
+            const newPromise = MyPromise.race(arrayOfPromisesAndNonPromises);
+            newPromise.then(callback);
+
+            expect(newPromise).toBeInstanceOf(MyPromise);
+            expect(callback).toHaveBeenCalledWith(1);
         });
     });
 });
