@@ -303,14 +303,47 @@ describe('MyPromise', () => {
 
             jest.useRealTimers();
         });
-        it('settles to the first occurrence of either a non-promise value or a settled promise, given an array of promises and non-promise values', () => {
-            const arrayOfPromisesAndNonPromises = [1, MyPromise.resolve(2), 3];
-            const callback = jest.fn();
-            const newPromise = MyPromise.race(arrayOfPromisesAndNonPromises);
-            newPromise.then(callback);
+        describe('given an array of promises and non-promise values', () => {
+            it('settles to the first occurrence of either a non-promise value or a settled promise', () => {
+                const arrayOfPromisesAndNonPromises = [
+                    1,
+                    MyPromise.resolve(2),
+                    3
+                ];
+                const callback = jest.fn();
+                const newPromise = MyPromise.race(
+                    arrayOfPromisesAndNonPromises
+                );
+                newPromise.then(callback);
 
-            expect(newPromise).toBeInstanceOf(MyPromise);
-            expect(callback).toHaveBeenCalledWith(1);
+                expect(newPromise).toBeInstanceOf(MyPromise);
+                expect(callback).toHaveBeenCalledWith(1);
+            });
+            it('resolves to the first non-promise value if it occurs before any settled promise', () => {
+                jest.useFakeTimers();
+
+                const arrayOfPromisesAndNonPromises = [
+                    new MyPromise((resolve, reject) => {
+                        setTimeout(() => resolve(1), 1000);
+                    }),
+                    new MyPromise((resolve, reject) => {
+                        setTimeout(() => reject(2), 2000);
+                    }),
+                    3
+                ];
+                const resolvedCallback = jest.fn();
+                const rejectedCallback = jest.fn();
+                const newPromise = MyPromise.race(
+                    arrayOfPromisesAndNonPromises
+                );
+                newPromise.then(resolvedCallback, rejectedCallback);
+                jest.runAllTimers();
+
+                expect(newPromise).toBeInstanceOf(MyPromise);
+                expect(resolvedCallback).toHaveBeenCalledWith(3);
+
+                jest.useRealTimers();
+            });
         });
     });
 });
