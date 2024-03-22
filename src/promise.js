@@ -106,4 +106,11 @@ MyPromise.allSettled = function (arrayOfPromises) {
     return MyPromise.resolve(arrayOfResults);
 };
 
+MyPromise.race = function (arrayOfPromises) {
+    const newPromise = new MyPromise((resolve, reject) => {});
+    newPromise.isDummyPromise = true;
+
+    return newPromise;
+};
+
 export default MyPromise;
