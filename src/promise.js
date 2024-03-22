@@ -115,16 +115,28 @@ MyPromise.race = function (arrayOfPromises) {
     }
 
     let result;
-    let isAnyPromiseSettled = false;
-    for (let i = 0; i < arrayOfPromises.length && !isAnyPromiseSettled; i++) {
-        arrayOfPromises[i].then((resolvedValue) => {
-            result = resolvedValue;
-            isAnyPromiseSettled = true;
-        });
+    let stateOfFirstPromiseSettled = false;
+    for (
+        let i = 0;
+        i < arrayOfPromises.length && !stateOfFirstPromiseSettled;
+        i++
+    ) {
+        arrayOfPromises[i].then(
+            (resolvedValue) => {
+                result = resolvedValue;
+                stateOfFirstPromiseSettled = STATE.FULFILLED;
+            },
+            (rejectedValue) => {
+                result = rejectedValue;
+                stateOfFirstPromiseSettled = STATE.REJECTED;
+            }
+        );
     }
 
-    if (isAnyPromiseSettled) {
+    if (stateOfFirstPromiseSettled === STATE.FULFILLED) {
         return MyPromise.resolve(result);
+    } else if (stateOfFirstPromiseSettled === STATE.REJECTED) {
+        return MyPromise.reject(result);
     }
 };
 
