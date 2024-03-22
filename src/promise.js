@@ -107,10 +107,25 @@ MyPromise.allSettled = function (arrayOfPromises) {
 };
 
 MyPromise.race = function (arrayOfPromises) {
-    const newPromise = new MyPromise((resolve, reject) => {});
-    newPromise.isDummyPromise = true;
+    if (arrayOfPromises.length === 0) {
+        const newPromise = new MyPromise((resolve, reject) => {});
+        newPromise.isDummyPromise = true;
 
-    return newPromise;
+        return newPromise;
+    }
+
+    let result;
+    let isAnyPromiseSettled = false;
+    for (let i = 0; i < arrayOfPromises.length && !isAnyPromiseSettled; i++) {
+        arrayOfPromises[i].then((resolvedValue) => {
+            result = resolvedValue;
+            isAnyPromiseSettled = true;
+        });
+    }
+
+    if (isAnyPromiseSettled) {
+        return MyPromise.resolve(result);
+    }
 };
 
 export default MyPromise;
