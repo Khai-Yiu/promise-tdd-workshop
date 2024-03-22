@@ -106,8 +106,8 @@ MyPromise.allSettled = function (arrayOfPromises) {
     return MyPromise.resolve(arrayOfResults);
 };
 
-MyPromise.race = function (arrayOfPromises) {
-    if (arrayOfPromises.length === 0) {
+MyPromise.race = function (arrayOfPromisesAndNonPromises) {
+    if (arrayOfPromisesAndNonPromises.length === 0) {
         const newPromise = new MyPromise((resolve, reject) => {});
         newPromise.isDummyPromise = true;
 
@@ -115,27 +115,33 @@ MyPromise.race = function (arrayOfPromises) {
     }
 
     let result;
-    let stateOfFirstPromiseSettled = false;
+    let stateOfFirstPromiseOrNonPromiseSettled;
     for (
         let i = 0;
-        i < arrayOfPromises.length && !stateOfFirstPromiseSettled;
+        i < arrayOfPromisesAndNonPromises.length &&
+        !stateOfFirstPromiseOrNonPromiseSettled;
         i++
     ) {
-        arrayOfPromises[i].then(
-            (resolvedValue) => {
-                result = resolvedValue;
-                stateOfFirstPromiseSettled = STATE.FULFILLED;
-            },
-            (rejectedValue) => {
-                result = rejectedValue;
-                stateOfFirstPromiseSettled = STATE.REJECTED;
-            }
-        );
+        if (arrayOfPromisesAndNonPromises[i] instanceof MyPromise) {
+            arrayOfPromisesAndNonPromises[i].then(
+                (resolvedValue) => {
+                    result = resolvedValue;
+                    stateOfFirstPromiseOrNonPromiseSettled = STATE.FULFILLED;
+                },
+                (rejectedValue) => {
+                    result = rejectedValue;
+                    stateOfFirstPromiseOrNonPromiseSettled = STATE.REJECTED;
+                }
+            );
+        } else {
+            result = arrayOfPromisesAndNonPromises[i];
+            stateOfFirstPromiseOrNonPromiseSettled = STATE.FULFILLED;
+        }
     }
 
-    if (stateOfFirstPromiseSettled === STATE.FULFILLED) {
+    if (stateOfFirstPromiseOrNonPromiseSettled === STATE.FULFILLED) {
         return MyPromise.resolve(result);
-    } else if (stateOfFirstPromiseSettled === STATE.REJECTED) {
+    } else if (stateOfFirstPromiseOrNonPromiseSettled === STATE.REJECTED) {
         return MyPromise.reject(result);
     }
 };
