@@ -266,8 +266,20 @@ describe('MyPromise', () => {
             newPromise.then(callback);
 
             expect(newPromise).toBeInstanceOf(MyPromise);
-            expect(newPromise.state).toBe('pending');
+            expect(newPromise).toHaveProperty('isDummyPromise', true);
             expect(callback).not.toHaveBeenCalled();
+        });
+        it('resolves to the value of the first promise given an array of resolved promises', () => {
+            const arrayOfPromises = [
+                MyPromise.resolve(1),
+                MyPromise.resolve(2)
+            ];
+            const callback = jest.fn();
+            const newPromise = MyPromise.race(arrayOfPromises);
+            newPromise.then(callback);
+
+            expect(newPromise).toBeInstanceOf(MyPromise);
+            expect(callback).toHaveBeenCalledWith(1);
         });
     });
 });
